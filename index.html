@@ -34,6 +34,33 @@
             font-size: 24px;
         }
 
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .state-filter {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 200px;
+            background-color: white;
+        }
+
+        .state-filter:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
         .town-list {
             list-style: none;
         }
@@ -72,6 +99,13 @@
             color: #3498db;
         }
 
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -89,12 +123,27 @@
             .town-name, .town-details {
                 min-width: 100%;
             }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .state-filter {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Towns with One Lakh Population</h1>
+        <div class="filters">
+            <span class="filter-label">Filter by State:</span>
+            <select class="state-filter" id="stateFilter">
+                <option value="">All States</option>
+            </select>
+        </div>
         <ul class="town-list" id="townList">
             <!-- Towns will be dynamically inserted here -->
         </ul>
@@ -170,15 +219,47 @@
             return population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
+        // Function to get unique states
+        function getUniqueStates() {
+            return [...new Set(towns.map(town => town.state))].sort();
+        }
+
+        // Function to populate state filter
+        function populateStateFilter() {
+            const stateFilter = document.getElementById('stateFilter');
+            const states = getUniqueStates();
+            
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateFilter.appendChild(option);
+            });
+        }
+
+        // Function to filter towns by state
+        function filterTownsByState(state) {
+            return state ? towns.filter(town => town.state === state) : towns;
+        }
+
         // Function to generate town list
-        function generateTownList() {
+        function generateTownList(filteredTowns) {
             const townList = document.getElementById('townList');
+            townList.innerHTML = ''; // Clear existing list
+            
+            if (filteredTowns.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = 'No towns found for the selected state.';
+                townList.appendChild(noResults);
+                return;
+            }
             
             // Sort towns by population in descending order
-            towns.sort((a, b) => b.population - a.population);
+            filteredTowns.sort((a, b) => b.population - a.population);
             
             // Generate HTML for each town
-            towns.forEach(town => {
+            filteredTowns.forEach(town => {
                 const li = document.createElement('li');
                 li.className = 'town-item';
                 li.innerHTML = `
@@ -192,8 +273,18 @@
             });
         }
 
-        // Generate the town list when the page loads
-        document.addEventListener('DOMContentLoaded', generateTownList);
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            populateStateFilter();
+            generateTownList(towns);
+
+            // Add event listener for state filter
+            document.getElementById('stateFilter').addEventListener('change', (e) => {
+                const selectedState = e.target.value;
+                const filteredTowns = filterTownsByState(selectedState);
+                generateTownList(filteredTowns);
+            });
+        });
     </script>
 </body>
 </html> 
