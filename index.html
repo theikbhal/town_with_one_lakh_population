@@ -37,14 +37,21 @@
         .filters {
             margin-bottom: 20px;
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
             flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .filter-label {
             font-weight: bold;
             color: #2c3e50;
+            white-space: nowrap;
         }
 
         .state-filter {
@@ -56,6 +63,16 @@
             background-color: white;
         }
 
+        .population-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 120px;
+            background-color: white;
+        }
+
+        .population-input:focus,
         .state-filter:focus {
             outline: none;
             border-color: #3498db;
@@ -129,7 +146,13 @@
                 align-items: stretch;
             }
 
-            .state-filter {
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .state-filter,
+            .population-input {
                 width: 100%;
             }
         }
@@ -139,10 +162,17 @@
     <div class="container">
         <h1>Towns with One Lakh Population</h1>
         <div class="filters">
-            <span class="filter-label">Filter by State:</span>
-            <select class="state-filter" id="stateFilter">
-                <option value="">All States</option>
-            </select>
+            <div class="filter-group">
+                <span class="filter-label">Filter by State:</span>
+                <select class="state-filter" id="stateFilter">
+                    <option value="">All States</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Population Range:</span>
+                <input type="number" class="population-input" id="minPopulation" placeholder="Min">
+                <input type="number" class="population-input" id="maxPopulation" placeholder="Max">
+            </div>
         </div>
         <ul class="town-list" id="townList">
             <!-- Towns will be dynamically inserted here -->
@@ -211,7 +241,10 @@
             { name: "Satara", population: 120195, state: "Maharashtra" },
             { name: "Barshi", population: 118722, state: "Maharashtra" },
             { name: "Gudivada", population: 118167, state: "Andhra Pradesh" },
-            { name: "Yavatmal", population: 116551, state: "Maharashtra" }
+            { name: "Yavatmal", population: 116551, state: "Maharashtra" },
+            { name: "Narasaraopet", population: 116250, state: "Andhra Pradesh" },
+            { name: "Kavali", population: 104000, state: "Andhra Pradesh" },
+            { name: "Tadepalligudem", population: 103906, state: "Andhra Pradesh" }
         ];
 
         // Function to format population number with commas
@@ -237,9 +270,30 @@
             });
         }
 
-        // Function to filter towns by state
-        function filterTownsByState(state) {
-            return state ? towns.filter(town => town.state === state) : towns;
+        // Function to filter towns by state and population range
+        function filterTowns() {
+            const selectedState = document.getElementById('stateFilter').value;
+            const minPopulation = document.getElementById('minPopulation').value;
+            const maxPopulation = document.getElementById('maxPopulation').value;
+
+            return towns.filter(town => {
+                // Filter by state if selected
+                if (selectedState && town.state !== selectedState) {
+                    return false;
+                }
+
+                // Filter by min population if provided
+                if (minPopulation && town.population < parseInt(minPopulation)) {
+                    return false;
+                }
+
+                // Filter by max population if provided
+                if (maxPopulation && town.population > parseInt(maxPopulation)) {
+                    return false;
+                }
+
+                return true;
+            });
         }
 
         // Function to generate town list
@@ -250,7 +304,7 @@
             if (filteredTowns.length === 0) {
                 const noResults = document.createElement('div');
                 noResults.className = 'no-results';
-                noResults.textContent = 'No towns found for the selected state.';
+                noResults.textContent = 'No towns found matching the selected criteria.';
                 townList.appendChild(noResults);
                 return;
             }
@@ -273,17 +327,21 @@
             });
         }
 
+        // Function to handle filter changes
+        function handleFilterChange() {
+            const filteredTowns = filterTowns();
+            generateTownList(filteredTowns);
+        }
+
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
             populateStateFilter();
             generateTownList(towns);
 
-            // Add event listener for state filter
-            document.getElementById('stateFilter').addEventListener('change', (e) => {
-                const selectedState = e.target.value;
-                const filteredTowns = filterTownsByState(selectedState);
-                generateTownList(filteredTowns);
-            });
+            // Add event listeners for filters
+            document.getElementById('stateFilter').addEventListener('change', handleFilterChange);
+            document.getElementById('minPopulation').addEventListener('input', handleFilterChange);
+            document.getElementById('maxPopulation').addEventListener('input', handleFilterChange);
         });
     </script>
 </body>
