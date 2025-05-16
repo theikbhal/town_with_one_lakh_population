@@ -101,6 +101,32 @@
             min-width: 200px;
         }
 
+        .town-link {
+            color: #3498db;
+            text-decoration: none;
+            position: relative;
+            padding-right: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .town-link:hover {
+            color: #2980b9;
+        }
+
+        .town-link::after {
+            content: "🔗";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .town-link:hover::after {
+            opacity: 1;
+        }
+
         .town-details {
             color: #666;
             flex: 2;
@@ -316,8 +342,14 @@
             filteredTowns.forEach(town => {
                 const li = document.createElement('li');
                 li.className = 'town-item';
+                
+                // Add Wikipedia link for Tadepalligudem
+                const townName = town.name === "Tadepalligudem" 
+                    ? `<a href="https://en.wikipedia.org/wiki/Tadepalligudem" target="_blank" class="town-link">${town.name}</a>`
+                    : town.name;
+
                 li.innerHTML = `
-                    <span class="town-name">${town.name}</span>
+                    <span class="town-name">${townName}</span>
                     <span class="town-details">
                         Population: <span class="population">${formatPopulation(town.population)}</span> | 
                         State: <span class="state">${town.state}</span>
