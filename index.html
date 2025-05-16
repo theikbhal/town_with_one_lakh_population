@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Towns with One Lakh Population</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .town-list {
+            list-style: none;
+        }
+
+        .town-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .town-item:last-child {
+            border-bottom: none;
+        }
+
+        .town-name {
+            font-weight: bold;
+            color: #2c3e50;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .town-details {
+            color: #666;
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .population {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .state {
+            color: #3498db;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+
+            .town-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .town-name, .town-details {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Towns with One Lakh Population</h1>
+        <ul class="town-list" id="townList">
+            <!-- Towns will be dynamically inserted here -->
+        </ul>
+    </div>
+
+    <script>
+        // Array of town objects
+        const towns = [
+            { name: "Morvi", population: 194947, state: "Gujarat" },
+            { name: "Fatehpur", population: 193193, state: "Uttar Pradesh" },
+            { name: "Rae Bareli", population: 191316, state: "Uttar Pradesh" },
+            { name: "Khora", population: 190005, state: "Uttar Pradesh" },
+            { name: "Bhusawal", population: 187421, state: "Maharashtra" },
+            { name: "Orai", population: 187137, state: "Uttar Pradesh" },
+            { name: "Bahraich", population: 186223, state: "Uttar Pradesh" },
+            { name: "Vellore", population: 185803, state: "Tamil Nadu" },
+            { name: "Mahesana", population: 184991, state: "Gujarat" },
+            { name: "Sambalpur", population: 184000, state: "Odisha" },
+            { name: "Raiganj", population: 183612, state: "West Bengal" },
+            { name: "Sirsa", population: 182534, state: "Haryana" },
+            { name: "Danapur", population: 182429, state: "Bihar" },
+            { name: "Serampore", population: 181842, state: "West Bengal" },
+            { name: "Sultan Pur Majra", population: 181554, state: "Delhi" },
+            { name: "Guna", population: 180935, state: "Madhya Pradesh" },
+            { name: "Jaunpur", population: 180362, state: "Uttar Pradesh" },
+            { name: "Panvel", population: 180020, state: "Maharashtra" },
+            { name: "Shivpuri", population: 179977, state: "Madhya Pradesh" },
+            { name: "Surendranagar Dudhrej", population: 177851, state: "Gujarat" },
+            { name: "Unnao", population: 177658, state: "Uttar Pradesh" },
+            { name: "Hugli-Chuchura", population: 177259, state: "West Bengal" },
+            { name: "Badlapur", population: 174226, state: "Maharashtra" },
+            { name: "Alappuzha", population: 174164, state: "Kerala" },
+            { name: "Kottayam", population: 172878, state: "Kerala" },
+            { name: "Gadag-Betageri", population: 172000, state: "Karnataka" },
+            { name: "Machilipatnam", population: 169892, state: "Andhra Pradesh" },
+            { name: "Shimla", population: 169578, state: "Himachal Pradesh" },
+            { name: "Adoni", population: 166537, state: "Andhra Pradesh" },
+            { name: "Tenali", population: 164937, state: "Andhra Pradesh" },
+            { name: "Proddatur", population: 162717, state: "Andhra Pradesh" },
+            { name: "Saharsa", population: 155175, state: "Bihar" },
+            { name: "Hindupur", population: 151835, state: "Andhra Pradesh" },
+            { name: "Sasaram", population: 147396, state: "Bihar" },
+            { name: "Hajipur", population: 147126, state: "Bihar" },
+            { name: "Beed", population: 146709, state: "Maharashtra" },
+            { name: "Bhimavaram", population: 142280, state: "Andhra Pradesh" },
+            { name: "Dehri", population: 137068, state: "Bihar" },
+            { name: "Madanapalle", population: 135669, state: "Andhra Pradesh" },
+            { name: "Siwan", population: 134458, state: "Bihar" },
+            { name: "Bettiah", population: 132896, state: "Bihar" },
+            { name: "Gondia", population: 132813, state: "Maharashtra" },
+            { name: "Guntakal", population: 126270, state: "Andhra Pradesh" },
+            { name: "Srikakulam", population: 125939, state: "Andhra Pradesh" },
+            { name: "Motihari", population: 125183, state: "Bihar" },
+            { name: "Dharmavaram", population: 121874, state: "Andhra Pradesh" },
+            { name: "Satara", population: 120195, state: "Maharashtra" },
+            { name: "Barshi", population: 118722, state: "Maharashtra" },
+            { name: "Gudivada", population: 118167, state: "Andhra Pradesh" },
+            { name: "Yavatmal", population: 116551, state: "Maharashtra" }
+        ];
+
+        // Function to format population number with commas
+        function formatPopulation(population) {
+            return population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Function to generate town list
+        function generateTownList() {
+            const townList = document.getElementById('townList');
+            
+            // Sort towns by population in descending order
+            towns.sort((a, b) => b.population - a.population);
+            
+            // Generate HTML for each town
+            towns.forEach(town => {
+                const li = document.createElement('li');
+                li.className = 'town-item';
+                li.innerHTML = `
+                    <span class="town-name">${town.name}</span>
+                    <span class="town-details">
+                        Population: <span class="population">${formatPopulation(town.population)}</span> | 
+                        State: <span class="state">${town.state}</span>
+                    </span>
+                `;
+                townList.appendChild(li);
+            });
+        }
+
+        // Generate the town list when the page loads
+        document.addEventListener('DOMContentLoaded', generateTownList);
+    </script>
+</body>
+</html> 
